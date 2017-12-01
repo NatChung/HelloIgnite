@@ -170,7 +170,7 @@ I added this snippet for better log with [Reactotorn](https://github.com/infinit
 
 ## Create a CounterContainers with CounterRedux
 
-###### Create container
+### Create container
 ```sh
 $ ignite generate container CounterContainer
 
@@ -178,7 +178,7 @@ $ ignite generate container CounterContainer
 ✔︎ App/Containers/Styles/CounterContainerStyle.js
 ```
 
-###### Add Counter component 
+### Add Counter component 
 ```javascript
 render = () => (
   <ScrollView style={styles.container}>
@@ -187,18 +187,18 @@ render = () => (
 )
 ```
 
-###### Chnage initiaRouteName in AppNavigation
+### Chnage initiaRouteName in AppNavigation
 ```javascript
 initialRouteName: 'CounterContainer',
 ```
 
-###### Create a redux
+### Create a redux
 ```sh
 $ ignite generate redux CounterRedux
 
 ✔︎ App/Redux/CounterReduxRedux.js
 ```
-###### Add redux code
+### Add redux code
 ```javascript
 import { createReducer, createActions } from 'reduxsauce'
 import Immutable from 'seamless-immutable'
@@ -232,7 +232,7 @@ export const reducer = createReducer(INITIAL_STATE, {
   [Types.SYNC_DECREASE]: syncDecreaseReduce
 })
 ```
-###### Add reducer to Redux/index.js
+### Add reducer to Redux/index.js
 ```javascript
 export const reducers = combineReducers({
   nav: require('./NavigationRedux').reducer,
@@ -241,7 +241,7 @@ export const reducers = combineReducers({
   counter: require('./CounterReduxRedux').reducer //<----
 })
 ```
-###### Add Redux unit test
+### Add Redux unit test
 ```javascript
 import Actions, { reducer, INITIAL_STATE } from '../../App/Redux/CounterReduxRedux'
 
@@ -257,5 +257,72 @@ test('syncDecreasement', () => {
 ```
 
 ## Create a CounterSaga
+
+### Create saga
+```sh
+$ ignite generate saga CounterSaga
+
+✔︎ App/Sagas/CounterSagaSagas.js
+```
+
+### Create asyn test 
+```javascript
+test('asyncIncreasement', () => {
+    const state = reducer(INITIAL_STATE, Actions.asyncIncrease())
+    expect(state.value).toBe(0)
+})
+
+test('asyncDecreasement', () => {
+    const state = reducer(INITIAL_STATE, Actions.asyncDecrease())
+    expect(state.value).toBe(0)
+})
+```
+
+### Create async action creator
+```javascript
+  asyncIncrease: null,
+  asyncDecrease: null
+```
+
+### Create async reduces
+```javascript
+...
+export const asyncIncreaseReduce = state => state
+export const asyncDecreaseReduce = state => state
+...
+
+...
+[Types.ASYNC_INCREASE]: asyncIncreaseReduce,
+[Types.ASYNC_DECREASE]: asyncDecreaseReduce
+...
+```
+### Create counter sata test code
+```javascript
+import { put, call } from 'redux-saga/effects'
+import { incrementAsync, delay } from '../../App/Sagas/CounterSaga'
+import CounterActions from '../../App/Redux/CounterRedux'
+
+const stepper = (fn) => (mock) => fn.next(mock).value
+
+test('counter aysnc saga test', () => {
+    const step = stepper(incrementAsync())
+    expect(step()).toEqual(call(delay, 1000))
+    expect(step()).toEqual(put(CounterActions.syncIncrease()))
+})
+```
+### Implement sata code
+```javascript
+import { call, put } from 'redux-saga/effects'
+import CounterActions from '../Redux/CounterRedux'
+
+export const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+export function * incrementAsync() {
+
+  yield call(delay, 1000)
+  yield put(CounterActions.syncIncrease())
+}
+```
+
 
 ## Test coverage

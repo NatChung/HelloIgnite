@@ -157,10 +157,104 @@ test('onAsyncDecrease', () => {
 ```
 
 ## Reactotron (Debug tools)
+I added this snippet for better log with [Reactotorn](https://github.com/infinitered/reactotron/blob/master/docs/quick-start-react-native.md)
+```json
+"Print to reactotron": {
+  "prefix": "tron",
+  "body": [
+    "console.tron.display({\n\tname:`$1`,\n\tpreview:`$2`,\n\tvalue: `$3`\n})"
+  ],
+  "description" : "Log ouput to reactotron"
+}
+```
 
-## Create a CounterContainers
+## Create a CounterContainers with CounterRedux
 
-## Create a CounterRedux
+###### Create container
+```sh
+$ ignite generate container CounterContainer
+
+✔︎ App/Containers/CounterContainer.js
+✔︎ App/Containers/Styles/CounterContainerStyle.js
+```
+
+###### Add Counter component 
+```javascript
+render = () => (
+  <ScrollView style={styles.container}>
+    <Counter value={this.state.value} />
+  </ScrollView>
+)
+```
+
+###### Chnage initiaRouteName in AppNavigation
+```javascript
+initialRouteName: 'CounterContainer',
+```
+
+###### Create a redux
+```sh
+$ ignite generate redux CounterRedux
+
+✔︎ App/Redux/CounterReduxRedux.js
+```
+###### Add redux code
+```javascript
+import { createReducer, createActions } from 'reduxsauce'
+import Immutable from 'seamless-immutable'
+
+/* ------------- Types and Action Creators ------------- */
+
+const { Types, Creators } = createActions({
+  syncIncrease: null,
+  syncDecrease: null
+})
+
+export const CounterReduxTypes = Types
+export default Creators
+
+/* ------------- Initial State ------------- */
+
+export const INITIAL_STATE = Immutable({
+  value: 0
+})
+
+/* ------------- Reducers ------------- */
+
+// request the data from an api
+export const syncIncreaseReduce = (state) => state.merge({ value: state.value+1 })
+export const syncDecreaseReduce = (state) => state.merge({ value: state.value-1 })
+
+/* ------------- Hookup Reducers To Types ------------- */
+
+export const reducer = createReducer(INITIAL_STATE, {
+  [Types.SYNC_INCREASE]: syncIncreaseReduce,
+  [Types.SYNC_DECREASE]: syncDecreaseReduce
+})
+```
+###### Add reducer to Redux/index.js
+```javascript
+export const reducers = combineReducers({
+  nav: require('./NavigationRedux').reducer,
+  github: require('./GithubRedux').reducer,
+  search: require('./SearchRedux').reducer,
+  counter: require('./CounterReduxRedux').reducer //<----
+})
+```
+###### Add Redux unit test
+```javascript
+import Actions, { reducer, INITIAL_STATE } from '../../App/Redux/CounterReduxRedux'
+
+test('syncIncreasement', () => {
+    const state = reducer(INITIAL_STATE, Actions.syncIncrease())
+    expect(state.value).toBe(1)
+})
+
+test('syncDecreasement', () => {
+    const state = reducer(INITIAL_STATE, Actions.syncDecrease())
+    expect(state.value).toBe(-1)
+})
+```
 
 ## Create a CounterSaga
 

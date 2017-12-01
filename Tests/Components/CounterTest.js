@@ -17,10 +17,7 @@ test('Counter component renders correctly', () => {
 })
 
 test('setValue', () => {
-    let i = 0 // i guess i could have used sinon here too... less is more i guess
-    const onPress = () => ++i
     const wrapperPress = shallow(<Counter value={13} />)
-
     expect(wrapperPress.find('Text').prop('children')).toBe(13)
 })
 

@@ -19,6 +19,142 @@ Simple type ignite generate will show list blew
   Check out https://github.com/infinitered/ignite for instructions on how to
   install some or how to build some for yourself.
 ```
+## Create a Components with Storybook
+Using [storybook](https://github.com/storybooks/storybook) to create component with its test
+
+1. Run component
+```sh
+$ npm run storybook
+$ react ntive run-ios
+```
+2. Open http://localhost:7007/
+3. Create componet
+```sh
+$ ignite generate component Counter
+✔︎ App/Components/Counter.js
+✔︎ App/Components/Styles/CounterStyle.js
+```
+4. Create Counter.story.js
+```sh
+$ touch App/Components/Counter.story.js
+```
+5. Add this code in Counter.sotry.js
+```javascript
+import React from 'react'
+import { View } from 'react-native'
+import { storiesOf } from '@storybook/react-native'
+import Counter from './Counter'
+
+storiesOf('Counter')
+  .add('Default', () => (
+    <Counter/>
+  ))
+```
+6. Import the story file to Stories.js
+``` javascript
+import './Counter.story'
+```
+7. Implement the component
+```javascript
+render = () => (
+  <View style={styles.container}>
+
+    <View style={styles.syncButton} >
+      <BlueButton text='SYNC+' onPress={this.props.onSyncIncrease} />
+      <RedButton text='SYNC-' onPress={this.props.onSyncDecrease} />
+    </View>
+
+    <Text style={styles.resultText}>{this.props.value}</Text>
+
+    <View style={styles.asyncButton} >
+      <BlueButton text='ASYN+' onPress={this.props.onAsyncIncrease} />
+      <RedButton text='ASYN-' onPress={this.props.onAsyncDecrease} />
+    </View>
+
+  </View>
+)
+```
+8. Test on Counter.Story.js
+```javascript
+storiesOf('Counter')
+  .add('Default', () => (
+    <Counter 
+        value={9}
+        onSyncIncrease={action('onSyncIncrease')} 
+        onSyncDecrease={action('onSyncDecrease')}
+        onAsyncIncrease={action('onAsyncIncrease')}
+        onAsyncDecrease={action('onAsyncDecrease')}
+        />
+  ))
+```
+
+9. Jest component
+  - Test render with match snapshort
+```javascript
+test('Counter component renders correctly', () => {
+  const tree = renderer.create(<Counter
+      value={9}
+      onSyncIncrease={() => { }}
+      onSyncDecrease={() => { }}
+      onAsyncIncrease={() => { }}
+      onAsyncDecrease={() => { }}
+  />).toJSON()
+  expect(tree).toMatchSnapshot()
+})
+  ```
+  - Test props.value
+```javascript
+test('setValue', () => {
+  const wrapperPress = shallow(<Counter value={13} />)
+  expect(wrapperPress.find('Text').prop('children')).toBe(13)
+})
+```
+  - Test earch onPress
+  ```javascript
+  test('onSyncIncrease', () => {
+    let i = 0 // i guess i could have used sinon here too... less is more i guess
+    const onPress = () => ++i
+    const wrapperPress = shallow(<Counter onSyncIncrease={onPress} />)
+
+    expect(wrapperPress.find('BlueButton').at(0).prop('onPress')).toBe(onPress) // uses the right handler
+    expect(i).toBe(0)
+    wrapperPress.find('BlueButton').at(0).simulate('press')
+    expect(i).toBe(1)
+})
+
+test('onSyncDecrease', () => {
+    let i = 0 // i guess i could have used sinon here too... less is more i guess
+    const onPress = () => ++i
+    const wrapperPress = shallow(<Counter onSyncDecrease={onPress} />)
+
+    expect(wrapperPress.find('RedButton').at(0).prop('onPress')).toBe(onPress) // uses the right handler
+    expect(i).toBe(0)
+    wrapperPress.find('RedButton').at(0).simulate('press')
+    expect(i).toBe(1)
+})
+
+test('onAsyncIncrease', () => {
+    let i = 0 // i guess i could have used sinon here too... less is more i guess
+    const onPress = () => ++i
+    const wrapperPress = shallow(<Counter onAsyncIncrease={onPress} />)
+
+    expect(wrapperPress.find('BlueButton').at(1).prop('onPress')).toBe(onPress) // uses the right handler
+    expect(i).toBe(0)
+    wrapperPress.find('BlueButton').at(1).simulate('press')
+    expect(i).toBe(1)
+})
+
+test('onAsyncDecrease', () => {
+    let i = 0 // i guess i could have used sinon here too... less is more i guess
+    const onPress = () => ++i
+    const wrapperPress = shallow(<Counter onAsyncDecrease={onPress} />)
+
+    expect(wrapperPress.find('RedButton').at(1).prop('onPress')).toBe(onPress) // uses the right handler
+    expect(i).toBe(0)
+    wrapperPress.find('RedButton').at(1).simulate('press')
+    expect(i).toBe(1)
+})
+```
 
 ## Reactotron (Debug tools)
 
@@ -27,7 +163,5 @@ Simple type ignite generate will show list blew
 ## Create a CounterRedux
 
 ## Create a CounterSaga
-
-## Create a Components with Storybook
 
 ## Test coverage

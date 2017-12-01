@@ -157,6 +157,16 @@ test('onAsyncDecrease', () => {
 ```
 
 ## Reactotron (Debug tools)
+I added this snippet for better log with [Reactotorn](https://github.com/infinitered/reactotron/blob/master/docs/quick-start-react-native.md)
+```json
+"Print to reactotron": {
+  "prefix": "tron",
+  "body": [
+    "console.tron.display({\n\tname:`$1`,\n\tpreview:`$2`,\n\tvalue: `$3`\n})"
+  ],
+  "description" : "Log ouput to reactotron"
+}
+```
 
 ## Create a CounterContainers
 

@@ -22,23 +22,23 @@ Simple type ignite generate will show list blew
 ## Create a Components with Storybook
 Using [storybook](https://github.com/storybooks/storybook) to create component with its test
 
-1. Run component
+### Run component
 ```sh
 $ npm run storybook
 $ react ntive run-ios
 ```
-2. Open http://localhost:7007/
-3. Create componet
+### Open http://localhost:7007/
+### Create componet
 ```sh
 $ ignite generate component Counter
 ✔︎ App/Components/Counter.js
 ✔︎ App/Components/Styles/CounterStyle.js
 ```
-4. Create Counter.story.js
+### Create Counter.story.js
 ```sh
 $ touch App/Components/Counter.story.js
 ```
-5. Add this code in Counter.sotry.js
+### Add this code in Counter.sotry.js
 ```javascript
 import React from 'react'
 import { View } from 'react-native'
@@ -50,11 +50,11 @@ storiesOf('Counter')
     <Counter/>
   ))
 ```
-6. Import the story file to Stories.js
+### Import the story file to Stories.js
 ``` javascript
 import './Counter.story'
 ```
-7. Implement the component
+### Implement the component
 ```javascript
 render = () => (
   <View style={styles.container}>
@@ -74,7 +74,7 @@ render = () => (
   </View>
 )
 ```
-8. Test on Counter.Story.js
+### Test on Counter.Story.js
 ```javascript
 storiesOf('Counter')
   .add('Default', () => (
@@ -88,8 +88,8 @@ storiesOf('Counter')
   ))
 ```
 
-9. Jest component
-  - Test render with match snapshort
+### Jest component
+###### Test render with match snapshort
 ```javascript
 test('Counter component renders correctly', () => {
   const tree = renderer.create(<Counter
@@ -102,14 +102,14 @@ test('Counter component renders correctly', () => {
   expect(tree).toMatchSnapshot()
 })
   ```
-  - Test props.value
+###### Test props.value
 ```javascript
 test('setValue', () => {
   const wrapperPress = shallow(<Counter value={13} />)
   expect(wrapperPress.find('Text').prop('children')).toBe(13)
 })
 ```
-  - Test earch onPress
+###### Test earch onPress
   ```javascript
   test('onSyncIncrease', () => {
     let i = 0 // i guess i could have used sinon here too... less is more i guess

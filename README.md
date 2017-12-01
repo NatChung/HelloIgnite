@@ -1,67 +1,167 @@
 #  HelloIgnite
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
+This is a practice project for [Ignite](https://github.com/infinitered/ignite) generated react native project. In this project, I will add a counterexample to test redux/saga from Ignite generate command also include generating container
 
-* Standard compliant React Native App Utilizing [Ignite](https://github.com/infinitered/ignite)
+## Ignite generate command
+Simple type ignite generate will show list blew
 
-## :arrow_up: How to Setup
+```makefile
+✨ Type ignite generate ________ to run one of these generators:
 
-**Step 1:** git clone this repo:
+  component   Generates a component, styles, and an optional test.
+  container   Generates a redux smart component.
+  listview    Deprecated - Use `list`
+  list        Generates a screen with a ListView/Flatlist/SectionList + walkthrough.
+  redux       Generates a action/creator/reducer set for Redux.
+  saga        Generates a saga with an optional test.
+  screen      Generates an opinionated container.
 
-**Step 2:** cd to the cloned repo:
-
-**Step 3:** Install the Application with `yarn` or `npm i`
-
-
-## :arrow_forward: How to Run App
-
-1. cd to the repo
-2. Run Build for either OS
-  * for iOS
-    * run `react-native run-ios`
-  * for Android
-    * Run Genymotion
-    * run `react-native run-android`
-
-## :no_entry_sign: Standard Compliant
-
-[![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
-This project adheres to Standard.  Our CI enforces this, so we suggest you enable linting to keep your project compliant during development.
-
-**To Lint on Commit**
-
-This is implemented using [husky](https://github.com/typicode/husky). There is no additional setup needed.
-
-**Bypass Lint**
-
-If you have to bypass lint for a special commit that you will come back and clean (pushing something to a branch etc.) then you can bypass git hooks with adding `--no-verify` to your commit command.
-
-**Understanding Linting Errors**
-
-The linting rules are from JS Standard and React-Standard.  [Regular JS errors can be found with descriptions here](http://eslint.org/docs/rules/), while [React errors and descriptions can be found here](https://github.com/yannickcr/eslint-plugin-react).
-
-## :closed_lock_with_key: Secrets
-
-This project uses [react-native-config](https://github.com/luggit/react-native-config) to expose config variables to your javascript code in React Native. You can store API keys
-and other sensitive information in a `.env` file:
-
+  --------------------------------------------------------------------------
+  Check out https://github.com/infinitered/ignite for instructions on how to
+  install some or how to build some for yourself.
 ```
-API_URL=https://myapi.com
-GOOGLE_MAPS_API_KEY=abcdefgh
+## Create a Components with Storybook
+Using [storybook](https://github.com/storybooks/storybook) to create component with its test
+
+### Run component
+```sh
+$ npm run storybook
+$ react ntive run-ios
+```
+### Open http://localhost:7007/
+### Create componet
+```sh
+$ ignite generate component Counter
+✔︎ App/Components/Counter.js
+✔︎ App/Components/Styles/CounterStyle.js
+```
+### Create Counter.story.js
+```sh
+$ touch App/Components/Counter.story.js
+```
+### Add this code in Counter.sotry.js
+```javascript
+import React from 'react'
+import { View } from 'react-native'
+import { storiesOf } from '@storybook/react-native'
+import Counter from './Counter'
+
+storiesOf('Counter')
+  .add('Default', () => (
+    <Counter/>
+  ))
+```
+### Import the story file to Stories.js
+``` javascript
+import './Counter.story'
+```
+### Implement the component
+```javascript
+render = () => (
+  <View style={styles.container}>
+
+    <View style={styles.syncButton} >
+      <BlueButton text='SYNC+' onPress={this.props.onSyncIncrease} />
+      <RedButton text='SYNC-' onPress={this.props.onSyncDecrease} />
+    </View>
+
+    <Text style={styles.resultText}>{this.props.value}</Text>
+
+    <View style={styles.asyncButton} >
+      <BlueButton text='ASYN+' onPress={this.props.onAsyncIncrease} />
+      <RedButton text='ASYN-' onPress={this.props.onAsyncDecrease} />
+    </View>
+
+  </View>
+)
+```
+### Test on Counter.Story.js
+```javascript
+storiesOf('Counter')
+  .add('Default', () => (
+    <Counter 
+        value={9}
+        onSyncIncrease={action('onSyncIncrease')} 
+        onSyncDecrease={action('onSyncDecrease')}
+        onAsyncIncrease={action('onAsyncIncrease')}
+        onAsyncDecrease={action('onAsyncDecrease')}
+        />
+  ))
 ```
 
-and access them from React Native like so:
-
+### Jest component
+###### Test render with match snapshort
+```javascript
+test('Counter component renders correctly', () => {
+  const tree = renderer.create(<Counter
+      value={9}
+      onSyncIncrease={() => { }}
+      onSyncDecrease={() => { }}
+      onAsyncIncrease={() => { }}
+      onAsyncDecrease={() => { }}
+  />).toJSON()
+  expect(tree).toMatchSnapshot()
+})
+  ```
+###### Test props.value
+```javascript
+test('setValue', () => {
+  const wrapperPress = shallow(<Counter value={13} />)
+  expect(wrapperPress.find('Text').prop('children')).toBe(13)
+})
 ```
-import Secrets from 'react-native-config'
+###### Test earch onPress
+  ```javascript
+  test('onSyncIncrease', () => {
+    let i = 0 // i guess i could have used sinon here too... less is more i guess
+    const onPress = () => ++i
+    const wrapperPress = shallow(<Counter onSyncIncrease={onPress} />)
 
-Secrets.API_URL  // 'https://myapi.com'
-Secrets.GOOGLE_MAPS_API_KEY  // 'abcdefgh'
+    expect(wrapperPress.find('BlueButton').at(0).prop('onPress')).toBe(onPress) // uses the right handler
+    expect(i).toBe(0)
+    wrapperPress.find('BlueButton').at(0).simulate('press')
+    expect(i).toBe(1)
+})
+
+test('onSyncDecrease', () => {
+    let i = 0 // i guess i could have used sinon here too... less is more i guess
+    const onPress = () => ++i
+    const wrapperPress = shallow(<Counter onSyncDecrease={onPress} />)
+
+    expect(wrapperPress.find('RedButton').at(0).prop('onPress')).toBe(onPress) // uses the right handler
+    expect(i).toBe(0)
+    wrapperPress.find('RedButton').at(0).simulate('press')
+    expect(i).toBe(1)
+})
+
+test('onAsyncIncrease', () => {
+    let i = 0 // i guess i could have used sinon here too... less is more i guess
+    const onPress = () => ++i
+    const wrapperPress = shallow(<Counter onAsyncIncrease={onPress} />)
+
+    expect(wrapperPress.find('BlueButton').at(1).prop('onPress')).toBe(onPress) // uses the right handler
+    expect(i).toBe(0)
+    wrapperPress.find('BlueButton').at(1).simulate('press')
+    expect(i).toBe(1)
+})
+
+test('onAsyncDecrease', () => {
+    let i = 0 // i guess i could have used sinon here too... less is more i guess
+    const onPress = () => ++i
+    const wrapperPress = shallow(<Counter onAsyncDecrease={onPress} />)
+
+    expect(wrapperPress.find('RedButton').at(1).prop('onPress')).toBe(onPress) // uses the right handler
+    expect(i).toBe(0)
+    wrapperPress.find('RedButton').at(1).simulate('press')
+    expect(i).toBe(1)
+})
 ```
 
-The `.env` file is ignored by git keeping those secrets out of your repo.
+## Reactotron (Debug tools)
 
-### Get started:
-1. Copy .env.example to .env
-2. Add your config variables
-3. Follow instructions at [https://github.com/luggit/react-native-config#setup](https://github.com/luggit/react-native-config#setup)
-4. Done!
+## Create a CounterContainers
+
+## Create a CounterRedux
+
+## Create a CounterSaga
+
+## Test coverage

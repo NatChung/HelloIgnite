@@ -10,17 +10,37 @@
 *    you'll need to define a constant in that file.
 *************************************************************/
 
-import { call, put } from 'redux-saga/effects'
-import CounterActions from '../Redux/CounterRedux'
+import { call, put, fork, take, cancel, takeEvery, takeLatest } from 'redux-saga/effects'
+import CounterActions, { CounterTypes } from '../Redux/CounterRedux'
 
 export const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-export function * incrementAsync() {
-  yield call(delay, 1000)
-  yield put(CounterActions.syncIncrease())
+export function *doDecrementAsync(){
+  yield call(delay, 2000)
+  yield put(CounterActions.syncDecrease())
 }
 
 export function * decrementAsync(){
-  yield call(delay, 1000)
-  yield put(CounterActions.syncDecrease())
+  const task = yield fork(doDecrementAsync)
+  yield fork(takeEvery, CounterTypes.STOP, cancelWorkerSaga, task)
 }
+
+function *doIncrementAsync(){
+  yield call(delay, 2000)
+  yield put(CounterActions.syncIncrease())
+}
+
+export function * incrementAsync() {
+  const task = yield fork(doIncrementAsync)
+  yield fork(takeLatest, CounterTypes.STOP, cancelWorkerSaga, task)
+}
+
+function* cancelWorkerSaga (task) {
+  console.tron.display({
+    name:`CounterTypes.STOP`,
+    preview:``,
+    value: ``
+  })
+  yield cancel(task)
+}
+

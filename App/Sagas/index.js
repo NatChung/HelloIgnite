@@ -1,4 +1,4 @@
-import { takeLatest, all } from 'redux-saga/effects'
+import { takeLatest, all, takeEvery } from 'redux-saga/effects'
 import API from '../Services/Api'
 import FixtureAPI from '../Services/FixtureApi'
 import DebugConfig from '../Config/DebugConfig'
@@ -13,7 +13,7 @@ import { CounterTypes } from '../Redux/CounterRedux'
 
 import { startup } from './StartupSagas'
 import { getUserAvatar } from './GithubSagas'
-import { incrementAsync, decrementAsync } from './CounterSaga'
+import { incrementAsync, decrementAsync ,timerTickSaga} from './CounterSaga'
 
 /* ------------- API ------------- */
 
@@ -30,7 +30,6 @@ export default function * root () {
 
     // some sagas receive extra parameters in addition to an action
     takeLatest(GithubTypes.USER_REQUEST, getUserAvatar, api),
-
     takeLatest(CounterTypes.ASYNC_INCREASE, incrementAsync),
     takeLatest(CounterTypes.ASYNC_DECREASE, decrementAsync)
   ])

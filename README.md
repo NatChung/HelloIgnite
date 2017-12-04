@@ -323,6 +323,30 @@ export function * incrementAsync() {
   yield put(CounterActions.syncIncrease())
 }
 ```
+### Add Cancellation
+I separate the saga to 2 step for cancellation
+```javascript
+function *doIncrementAsync(){
+  yield call(delay, 2000)
+  yield put(CounterActions.syncIncrease())
+}
 
+export function * incrementAsync() {
+  const task = yield fork(doIncrementAsync)
+  yield fork(takeLatest, CounterTypes.STOP, cancelWorkerSaga, task)
+}
+
+function* cancelWorkerSaga (task) {
+  console.tron.display({
+    name:`CounterTypes.STOP`,
+    preview:``,
+    value: ``
+  })
+  yield cancel(task)
+}
+```
+```javascrip
+takeLatest(CounterTypes.ASYNC_INCREASE, incrementAsync)
+```
 
 ## Test coverage
